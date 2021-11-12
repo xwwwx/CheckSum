@@ -14,7 +14,7 @@ namespace CheckSum
         {
             var result = new List<FileInfo>();
 
-            if (except != null && except.Any(e => root.EndsWith(e)))
+            if (except?.Any(e => root.EndsWith(e)) == true)
                 return result;
 
             var checkPath = CheckPath(root);
@@ -51,7 +51,6 @@ namespace CheckSum
         private static FileHash GetFileHash(FileInfo file)
         {
             using var stream = file.OpenRead();
-            using var inputStream = new MemoryStream();
             using var md5 = MD5.Create();
 
             return new FileHash

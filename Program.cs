@@ -12,6 +12,8 @@ namespace CheckSum
             var scanDir = config.GetValue<string>("ScanDir");
             var except = config.GetSection("Except").Get<string[]>();
             var output = config.GetValue<string>("OutPut");
+            var sendMail = config.GetValue<bool>("SendMail");
+            var mailConfig = config.GetSection("MailConfig").Get<MailConfig>();
 
             var files = CheckSum.ScanFile(scanDir, except);
 
@@ -32,6 +34,9 @@ namespace CheckSum
                 var reportText = CheckSum.GenCheckReportText(createdFiles, modifiedFiles, deletedFile);
 
                 _ = CheckSum.WriteReport(output, reportText);
+
+                if(sendMail)
+                    CheckSum.SendReportMail(mailConfig, reportText);
             }
         }
     }

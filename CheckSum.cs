@@ -1,4 +1,7 @@
-﻿using System;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -217,6 +220,28 @@ namespace CheckSum
             streamWriter.Close();
 
             return report;
+        }
+
+        public static void SendReportMail(MailConfig mailConfig, string reportText)
+        {
+            var message = new MimeMessage();
+            //寄件者
+            message.From.Add(MailboxAddress.Parse(mailConfig.User));
+            //收件者
+            foreach (string recipient in mailConfig.Recipients)
+                message.To.Add(MailboxAddress.Parse(recipient));
+            //主旨
+            message.Subject = mailConfig.Subject;
+            //內容
+            var body = new TextPart(TextFormat.Text);
+            body.SetText(Encoding.UTF8, reportText);
+            message.Body = body;
+
+            using var smtpClient = new SmtpClient();
+            smtpClient.Connect(mailConfig.Host);
+            smtpClient.Authenticate(mailConfig.User, mailConfig.Password);
+            smtpClient.Send(message);
+            smtpClient.Disconnect(true);
         }
 
         private static PathEnum CheckPath(string path)

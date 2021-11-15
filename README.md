@@ -9,3 +9,10 @@
 * ScanDir : 檢查的根路徑，程式將針對該路徑進行完整性驗證。
 * OutPut : 每次檢查產生得紀錄檔及報告將產生於此路徑內。
 * Except : 將不須檢查的檔案或資料夾名稱以字串陣列型態存放於此。
+* SendMail : 是否寄發通知信。
+* MailConfig : 通知信相關設定。
+  - Host : Host Domain。
+  - Recipients : 收件者以字串陣列型態存放於此。
+  - Subject : 通知信主旨。
+  - User : 寄件者帳號。
+  - Password : 寄件者密碼。

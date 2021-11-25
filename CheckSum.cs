@@ -25,7 +25,7 @@ namespace CheckSum
             if (PathEnum.NotExsits == checkPath)
                 return result;
 
-            if (PathEnum.IsFile == checkPath)
+            if (PathEnum.File == checkPath)
             {
                 result.Add(new FileInfo(root));
                 return result;
@@ -66,7 +66,8 @@ namespace CheckSum
 
         public static FileInfo WriteHashLog(string output, IEnumerable<FileHash> fileHashes)
         {
-            FileInfo hashLog = new FileInfo($"{output}\\FileHash_{DateTime.Now.ToFileTime()}.hashlog");
+            var hashLogPath = Path.Combine(output, $"FileHash_{DateTime.Now.ToFileTime()}.hashlog");
+            FileInfo hashLog = new FileInfo(hashLogPath);
             using var stream = hashLog.Create();
             JsonSerializer.Serialize(stream, fileHashes);
             stream.Close();
@@ -213,7 +214,9 @@ namespace CheckSum
             if (PathEnum.NotExsits == CheckPath(output))
                 throw new DirectoryNotFoundException("output not exsits");
 
-            var report = new FileInfo($"{output}\\Report_{DateTime.Now.ToFileTime()}.txt");
+            var reportPath = Path.Combine(output, $"Report_{DateTime.Now.ToFileTime()}.txt");
+            var report = new FileInfo(reportPath);
+
             using var streamWriter = report.CreateText();
 
             streamWriter.Write(reportText);
@@ -247,9 +250,9 @@ namespace CheckSum
         private static PathEnum CheckPath(string path)
         {
             if (Directory.Exists(path))
-                return PathEnum.IsDirectory;
+                return PathEnum.Directory;
             if (File.Exists(path))
-                return PathEnum.IsFile;
+                return PathEnum.File;
             return PathEnum.NotExsits;
         }
     }

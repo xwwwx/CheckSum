@@ -6,7 +6,7 @@ namespace CheckSum
     public enum PathEnum
     {
         NotExsits,
-        IsDirectory,
-        IsFile
+        Directory,
+        File
     }
 }

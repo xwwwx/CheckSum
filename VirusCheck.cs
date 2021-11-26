@@ -50,7 +50,7 @@ namespace CheckSum
             using var httpClient = HttpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Add("x-apikey", config.ApiKey);
             var response = await httpClient.GetAsync($"{VIRUS_CHECK_SERVER_URL}/{hash.Hash}");
-            var c = await response.Content.ReadAsStringAsync();
+            
             if (response.IsSuccessStatusCode)
             {
                 try

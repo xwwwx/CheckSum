@@ -14,6 +14,7 @@ namespace CheckSum
             var scanDir = config.GetValue<string>("ScanDir");
             var except = config.GetSection("Except").Get<string[]>();
             var output = config.GetValue<string>("OutPut");
+            var virusTotalConfig = config.GetSection("VirusTotalConfig").Get<VirusTotalConfig>();
             var sendMail = config.GetValue<bool>("SendMail");
             var mailConfig = config.GetSection("MailConfig").Get<MailConfig>();
             #endregion
@@ -23,6 +24,13 @@ namespace CheckSum
 
             //取得所有檔案的Hash(MD5)
             var fileHashs = CheckSum.GetFileHashs(files);
+
+            //連接 VirusTotal 檢驗檔案可信度
+            if (virusTotalConfig.Scan)
+            {
+                VirusCheck.LoadConfig(virusTotalConfig);
+                fileHashs = await VirusCheck.ScanHashs(fileHashs);
+            }
 
             //取得上次檢查的HashLog
             var lastHashLog = CheckSum.GetLastHashLogFromOutputDir(output);
@@ -48,8 +56,11 @@ namespace CheckSum
                 //取得啟動尋找刪除任務結果
                 var deletedFile = await findDeletedTask;
 
+                //取得可疑檔案
+                var suspiciousFile = fileHashs.Where(f => f.IsSuspiciousFile).ToList();
+
                 //產生差異報告文字
-                var reportText = CheckSum.GenCheckReportText(createdFiles, modifiedFiles, deletedFile);
+                var reportText = CheckSum.GenCheckReportText(createdFiles, modifiedFiles, deletedFile, suspiciousFile);
 
                 //產生差異報告檔案
                 _ = CheckSum.WriteReport(output, reportText);

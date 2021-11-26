@@ -9,5 +9,7 @@ namespace CheckSum
         public string Hash { get; set; }
 
         public DateTime HashTime { get; set; }
+
+        public bool IsSuspiciousFile { get; set; }
     }
 }

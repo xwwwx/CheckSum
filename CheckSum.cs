@@ -141,13 +141,13 @@ namespace CheckSum
             return deletedFiles;
         }
 
-        public static string GenCheckReportText(IEnumerable<FileHash> createdFiles, IEnumerable<FileHash> modifiedFiles, IEnumerable<FileHash> deletedFiles)
+        public static string GenCheckReportText(IEnumerable<FileHash> createdFiles, IEnumerable<FileHash> modifiedFiles, IEnumerable<FileHash> deletedFiles, IEnumerable<FileHash> suspiciousFiles)
         {
             StringBuilder reportText = new StringBuilder();
             reportText.AppendLine(@"    檔案完整性檢查報告    ");
             reportText.AppendLine(@"==========================");
 
-            if(!createdFiles.Any() && !modifiedFiles.Any() && !deletedFiles.Any())
+            if(!createdFiles.Any() && !modifiedFiles.Any() && !deletedFiles.Any() && !suspiciousFiles.Any())
             {
 
                 reportText.AppendLine(@"    檔案無異動    ");
@@ -196,6 +196,22 @@ namespace CheckSum
                     {
                         reportText.AppendLine(@$"檔名:{deletedFile.Name}");
                         reportText.AppendLine($@"HASH:{deletedFile.Hash}");
+                        reportText.AppendLine();
+                    }
+
+                    reportText.AppendLine(@"-----------------------");
+                }
+
+                if (suspiciousFiles.Any())
+                {
+                    reportText.AppendLine();
+                    reportText.AppendLine("    可疑檔案(Report By VirusTotal)");
+                    reportText.AppendLine(@"-----------------------");
+
+                    foreach (FileHash suspiciousFile in suspiciousFiles)
+                    {
+                        reportText.AppendLine(@$"檔名:{suspiciousFile.Name}");
+                        reportText.AppendLine($@"HASH:{suspiciousFile.Hash}");
                         reportText.AppendLine();
                     }
 

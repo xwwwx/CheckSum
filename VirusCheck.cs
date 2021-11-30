@@ -33,24 +33,29 @@ namespace CheckSum
             VirusCheck.config = config;
         }
 
-        public static async Task<List<FileHash>> ScanHashs(IList<FileHash> hashs)
+        public static async Task<List<FileHash>> ScanHashs(IEnumerable<FileHash> hashs)
         {
-            for (int i = 0; i < hashs.Count(); i++)
+            var tasks = new List<Task>();
+
+            foreach(var hash in hashs)
             {
-                if (!config.ScanExtension.Any(se => hashs[i].Name.EndsWith(se, StringComparison.OrdinalIgnoreCase)))
+                if (!config.ScanExtension.Any(se => hash.Name.EndsWith(se, StringComparison.OrdinalIgnoreCase)))
                     continue;
-                hashs[i] = await GetCheckResult(hashs[i]);
+
+                tasks.Add(GetCheckResult(hash));
             }
+
+            await Task.WhenAll(tasks);
 
             return hashs.ToList();
         }
 
-        private static async Task<FileHash> GetCheckResult(FileHash hash)
+        private static async Task GetCheckResult(FileHash hash)
         {
             using var httpClient = HttpClientFactory.CreateClient();
             httpClient.DefaultRequestHeaders.Add("x-apikey", config.ApiKey);
-            var response = await httpClient.GetAsync($"{VIRUS_CHECK_SERVER_URL}/{hash.Hash}");
-            
+            using var response = await httpClient.GetAsync($"{VIRUS_CHECK_SERVER_URL}/{hash.Hash}");
+
             if (response.IsSuccessStatusCode)
             {
                 try
@@ -70,8 +75,6 @@ namespace CheckSum
                 }
                 finally { }
             }
-            
-            return hash;
         }
     }
 }

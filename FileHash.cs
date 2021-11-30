@@ -2,7 +2,7 @@
 
 namespace CheckSum
 {
-    public struct FileHash
+    public class FileHash
     {
         public string Name { get; set; }
 

@@ -37,11 +37,11 @@ namespace CheckSum
         {
             var tasks = new List<Task>();
 
-            foreach(var hash in hashs)
-            {
-                if (!config.ScanExtension.Any(se => hash.Name.EndsWith(se, StringComparison.OrdinalIgnoreCase)))
-                    continue;
+            var scanExtensionSet = config.ScanExtension.Select(ext => $".{ext.ToLower()}").ToHashSet();
+            var scanHashs = hashs.Where(h => scanExtensionSet.Contains(Path.GetExtension(h.Name)));
 
+            foreach (var hash in scanHashs)
+            {
                 tasks.Add(GetCheckResult(hash));
             }
 

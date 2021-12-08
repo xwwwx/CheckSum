@@ -66,6 +66,7 @@ namespace CheckSum
 
         public static FileInfo WriteHashLog(string output, IEnumerable<FileHash> fileHashes)
         {
+            Directory.CreateDirectory(output);
             var hashLogPath = Path.Combine(output, $"FileHash_{DateTime.Now.ToFileTime()}.hashlog");
             FileInfo hashLog = new FileInfo(hashLogPath);
             using var stream = hashLog.Create();

@@ -33,11 +33,8 @@ namespace CheckSum
 
             var rootDir = new DirectoryInfo(root);
 
-            foreach(var childDir in rootDir.EnumerateDirectories())
-                result.AddRange(ScanFile(childDir.FullName, except));
-
-            foreach (var file in rootDir.EnumerateFiles())
-                result.Add(file);
+            foreach(var fileSystemInfo in rootDir.EnumerateFileSystemInfos())
+                result.AddRange(ScanFile(fileSystemInfo.FullName, except));
 
             return result;
         }

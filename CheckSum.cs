@@ -51,12 +51,13 @@ namespace CheckSum
         private static FileHash GetFileHash(FileInfo file)
         {
             using var stream = file.OpenRead();
-            using var md5 = MD5.Create();
+            using var md5 = SHA256.Create();
 
             return new FileHash
             {
                 Name = file.FullName,
                 Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty),
+                LastWriteDate = file.LastWriteTime,
                 HashTime = DateTime.Now
             };
         }
@@ -162,6 +163,7 @@ namespace CheckSum
                     {
                         reportText.AppendLine($@"檔名:{createdFile.Name}");
                         reportText.AppendLine($@"HASH:{createdFile.Hash}");
+                        reportText.AppendLine($@"LastWriteTime:{createdFile.LastWriteDate}");
                         reportText.AppendLine();
                     }
 
@@ -178,6 +180,7 @@ namespace CheckSum
                     {
                         reportText.AppendLine($@"檔名:{modifiedFile.Name}");
                         reportText.AppendLine($@"HASH:{modifiedFile.Hash}");
+                        reportText.AppendLine($@"LastWriteTime:{modifiedFile.LastWriteDate}");
                         reportText.AppendLine();
                     }
 

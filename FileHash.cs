@@ -8,6 +8,8 @@ namespace CheckSum
 
         public string Hash { get; set; }
 
+        public DateTime LastWriteDate { get; set; }
+
         public DateTime HashTime { get; set; }
     }
 }

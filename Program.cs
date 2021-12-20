@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,11 +19,14 @@ namespace CheckSum
             var mailConfig = config.GetSection("MailConfig").Get<MailConfig>();
             #endregion
 
+            Console.WriteLine($"檢驗路徑: {scanDir}");
+
             //掃描需檢查的檔案
             var files = CheckSum.ScanFile(scanDir, except);
 
-            //取得所有檔案的Hash(MD5)
+            //取得所有檔案的Hash(SHA256)
             var fileHashs = CheckSum.GetFileHashs(files);
+            Console.WriteLine($"此次驗證檔案筆數: {fileHashs.Count}");
 
             //取得上次檢查的HashLog
             var lastHashLog = CheckSum.GetLastHashLogFromOutputDir(output);
@@ -58,6 +62,8 @@ namespace CheckSum
                 if(sendMail)
                     CheckSum.SendReportMail(mailConfig, reportText);
             }
+
+            Console.WriteLine("檢驗完畢!");
         }
     }
 }

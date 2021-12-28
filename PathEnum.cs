@@ -3,7 +3,7 @@
 namespace CheckSum
 {
     [Flags]
-    public enum PathEnum
+    public enum PathType
     {
         NotExsits,
         Directory,

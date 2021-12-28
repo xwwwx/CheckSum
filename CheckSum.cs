@@ -8,6 +8,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CheckSum
 {
@@ -20,12 +22,12 @@ namespace CheckSum
             if (except?.Any(e => root.EndsWith(e)) == true)
                 return result;
 
-            var checkPath = CheckPath(root);
+            var pathType = GetPathType(root);
 
-            if (PathEnum.NotExsits == checkPath)
+            if (PathType.NotExsits == pathType)
                 return result;
 
-            if (PathEnum.File == checkPath)
+            if (PathType.File == pathType)
             {
                 result.Add(new FileInfo(root));
                 return result;
@@ -33,7 +35,7 @@ namespace CheckSum
 
             var rootDir = new DirectoryInfo(root);
 
-            foreach(var fileSystemInfo in rootDir.EnumerateFileSystemInfos())
+            foreach (var fileSystemInfo in rootDir.EnumerateFileSystemInfos())
                 result.AddRange(ScanFile(fileSystemInfo.FullName, except));
 
             return result;
@@ -51,12 +53,12 @@ namespace CheckSum
         private static FileHash GetFileHash(FileInfo file)
         {
             using var stream = file.OpenRead();
-            using var md5 = SHA256.Create();
+            using var sha256 = SHA256.Create();
 
             return new FileHash
             {
                 Name = file.FullName,
-                Hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty),
+                Hash = BitConverter.ToString(sha256.ComputeHash(stream)).Replace("-", string.Empty),
                 LastWriteDate = file.LastWriteTime,
                 HashTime = DateTime.Now
             };
@@ -101,7 +103,6 @@ namespace CheckSum
 
         public static (List<FileHash> createdFiles, List<FileHash> modifiedFiles) FindCreatedOrModifiedFile(IEnumerable<FileHash> currentFileHashs, IEnumerable<FileHash> lastFileHashs)
         {
-
             ISet<string> fileNamsSet = lastFileHashs.Select(h => h.Name).ToHashSet();
             ISet<string> fileHashSet = lastFileHashs.Select(h => $"{h.Name}-{h.Hash}").ToHashSet();
 
@@ -212,7 +213,7 @@ namespace CheckSum
 
         public static FileInfo WriteReport(string output, string reportText)
         {
-            if (PathEnum.NotExsits == CheckPath(output))
+            if (PathType.NotExsits == GetPathType(output))
                 throw new DirectoryNotFoundException("output not exsits");
 
             var reportPath = Path.Combine(output, $"Report_{DateTime.Now.ToFileTime()}.txt");
@@ -248,13 +249,13 @@ namespace CheckSum
             smtpClient.Disconnect(true);
         }
 
-        private static PathEnum CheckPath(string path)
+        private static PathType GetPathType(string path)
         {
             if (Directory.Exists(path))
-                return PathEnum.Directory;
+                return PathType.Directory;
             if (File.Exists(path))
-                return PathEnum.File;
-            return PathEnum.NotExsits;
+                return PathType.File;
+            return PathType.NotExsits;
         }
     }
 }

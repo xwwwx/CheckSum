@@ -59,8 +59,14 @@ namespace CheckSum
                 _ = CheckSum.WriteReport(output, reportText);
 
                 //寄出差異報告Mail
-                if(sendMail)
+                if (sendMail)
+                {
+                    //若檢測到檔案異動則顯示於主旨
+                    if (createdFiles.Any() || modifiedFiles.Any() || deletedFile.Any())
+                        mailConfig.Subject += $" - 檔案異動 {createdFiles.Count + modifiedFiles.Count + deletedFile.Count} 支";
+
                     CheckSum.SendReportMail(mailConfig, reportText);
+                }
             }
 
             Console.WriteLine("檢驗完畢!");

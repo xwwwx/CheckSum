@@ -46,7 +46,7 @@ namespace CheckSum
             return files
                 .AsParallel()
                 .Where(file => file.Exists)
-                .Select(file => GetFileHash(file))
+                .Select(GetFileHash)
                 .ToList();
         }
 
